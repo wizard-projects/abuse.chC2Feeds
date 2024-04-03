@@ -1,46 +1,53 @@
-!#/bin/python3
+#!/bin/python3
+import os
 import requests
 from github import Github
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import os
+import requests
+from github import Github
 
-def download_csv(url):
-    # Use streaming download to efficiently handle large files
-    with requests.get(url, stream=True) as response:
-        response.raise_for_status()
-        return response.content
+def download_file(url, save_path):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(save_path, 'wb') as f:
+            f.write(response.content)
+        print("File downloaded successfully.")
+    else:
+        print(f"Failed to download the file. Status code: {response.status_code}")
 
-def upload_to_github(repo_name, file_name, file_content, github_token):
-    try:
-        g = Github(github_token)
-        user = g.get_user()
-        repo = user.get_repo(repo_name)
-        
-        # Check if the file exists
-        existing_file = repo.get_contents(file_name)
-        
-        # Update the file
-        repo.update_file(existing_file.path, f"Updating {file_name}", file_content, existing_file.sha)
-        logger.info(f"File '{file_name}' updated in '{repo_name}' repository.")
-    except Exception as e:
-        # File does not exist, create a new one
-        repo.create_file(file_name, f"Adding {file_name}", file_content)
-        logger.info(f"File '{file_name}' uploaded to '{repo_name}' repository.")
+def upload_to_github(file_path, repo_name, github_token):
+    github = Github(github_token)
+    repo = github.get_repo(repo_name)
+    filename = os.path.basename(file_path)
+    with open(file_path, 'r', encoding='utf-8') as file:
+        content = file.read()
+        try:
+            repo.create_file(filename, "Updated IP blocklist", content)
+            print("File uploaded to GitHub successfully.")
+        except Exception as e:
+            print(f"Failed to upload file to GitHub: {e}")
+
+def main():
+    # File download settings
+    url = "https://feodotracker.abuse.ch/downloads/ipblocklist.csv"
+    download_dir = "/home/mraiham/abuse.ch"
+    file_path = os.path.join(download_dir, "ipblocklist.csv")
+
+    # GitHub settings
+    repo_name = "wizard-projects/abuse.chC2Feeds"
+    github_token = "*********"  # Make sure to replace this with your GitHub token
+
+    # Create directory if it doesn't exist
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
+
+    # Download the file
+    download_file(url, file_path)
+
+    # Upload the file to GitHub
+    upload_to_github(file_path, repo_name, github_token)
 
 if __name__ == "__main__":
-    csv_url = "https://feodotracker.abuse.ch/downloads/ipblocklist.csv"
-    github_repo = "YourGitHubUsername/YourRepository"
-    github_token = "YourGitHubToken"
-    file_name = "ipblocklist.csv"
-    
-    try:
-        logger.info("Downloading CSV file...")
-        csv_content = download_csv(csv_url)
-        logger.info("Uploading CSV file to GitHub...")
-        upload_to_github(github_repo, file_name, csv_content, github_token)
-        logger.info("Process completed successfully.")
-    except Exception as e:
-        logger.error(f"An error occurred: {e}")
+    main()
