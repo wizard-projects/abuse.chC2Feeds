@@ -1,6 +1,6 @@
 ################################################################
 # abuse.ch Feodo Tracker Botnet C2 IP Blocklist (CSV)          #
-# Last updated: 2024-03-26 23:30:15 UTC                        #
+# Last updated: 2024-04-04 07:03:03 UTC                        #
 #                                                              #
 # Terms Of Use: https://feodotracker.abuse.ch/blocklist/       #
 # For questions please contact feodotracker [at] abuse.ch      #
@@ -34,4 +34,5 @@
 "2024-03-26 23:30:11","194.233.91.144","5000","online","2024-04-04","Pikabot"
 "2024-03-26 23:30:12","158.220.95.215","5242","offline","2024-03-27","Pikabot"
 "2024-03-26 23:30:15","84.247.157.112","13783","online","2024-04-04","Pikabot"
-# END 27 entries
+"2024-04-04 07:03:03","172.233.221.61","5938","offline","2024-04-04","Pikabot"
+# END 28 entries
